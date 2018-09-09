@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/crywolf/toyrobot/storage"
+	"github.com/crywolf/toyrobot/storage/memory"
 )
 
 func Test_start(t *testing.T) {
@@ -55,8 +55,14 @@ func Test_start(t *testing.T) {
 		},
 
 		{
-			"Try to place outside the table 1 ends with error",
+			"Try to place outside the table ends with error 1",
 			"PLACE -1,2,SOUTH LEFT MOVE MOVE REPORT",
+			"",
+			true,
+		},
+		{
+			"Try to place outside the table ends with error 2",
+			"PLACE 5,2,SOUTH REPORT",
 			"",
 			true,
 		},
@@ -67,10 +73,16 @@ func Test_start(t *testing.T) {
 			"-> position: 2,2,WEST",
 			false,
 		},
+		{
+			"Report command used more then once ",
+			"PLACE 3,2,WEST REPORT MOVE REPORT",
+			"-> position: 3,2,WEST\n-> position: 2,2,WEST",
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			storage := storage.NewStorage()
+			storage := memory.NewStorage()
 			var output bytes.Buffer
 
 			args := strings.Split(tt.args, " ")

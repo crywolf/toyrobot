@@ -8,12 +8,11 @@ import (
 
 	"github.com/crywolf/toyrobot/robot"
 	"github.com/crywolf/toyrobot/storage"
+	"github.com/crywolf/toyrobot/storage/memory"
 )
 
-type Command = robot.Command
-
 func main() {
-	err := start(os.Args[1:], storage.NewStorage(), os.Stdout)
+	err := start(os.Args[1:], memory.NewStorage(), os.Stdout)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}
@@ -25,8 +24,8 @@ func start(programArgs []string, storage storage.Storage, output io.Writer) erro
 }
 
 // parses commandline and creates corresponding commands
-func prepareCommands(programArgs []string) []Command {
-	var commands []Command
+func prepareCommands(programArgs []string) []robot.Command {
+	var commands []robot.Command
 
 	argumentFound := false
 	for i, arg := range programArgs {

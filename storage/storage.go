@@ -6,23 +6,27 @@ import (
 )
 
 type Storage interface {
-	Position() point
-	SetPosition(point)
-	Direction() direction
-	SetDirection(direction)
+	Position() Point
+	SetPosition(Point)
+	Direction() Direction
+	SetDirection(Direction)
 	fmt.Stringer
 }
 
-type direction int
+type Point struct {
+	X, Y int
+}
+
+type Direction int
 
 const (
-	NORTH direction = iota
+	NORTH Direction = iota
 	EAST
 	SOUTH
 	WEST
 )
 
-func (d direction) String() string {
+func (d Direction) String() string {
 	names := [...]string{
 		"NORTH",
 		"EAST",
@@ -36,7 +40,7 @@ func (d direction) String() string {
 	return names[d]
 }
 
-func (d *direction) FromString(s string) error {
+func (d *Direction) FromString(s string) error {
 	switch strings.ToLower(s) {
 	case "north":
 		*d = NORTH
@@ -50,40 +54,4 @@ func (d *direction) FromString(s string) error {
 		return fmt.Errorf("illegal direction string value '%s'", s)
 	}
 	return nil
-}
-
-type point struct {
-	X, Y int
-}
-
-type storage struct {
-	position  point
-	direction direction
-}
-
-func NewStorage() *storage {
-	return &storage{
-		position:  point{},
-		direction: NORTH,
-	}
-}
-
-func (s *storage) Position() point {
-	return s.position
-}
-
-func (s *storage) SetPosition(p point) {
-	s.position = p
-}
-
-func (s *storage) Direction() direction {
-	return s.direction
-}
-
-func (s *storage) SetDirection(d direction) {
-	s.direction = d
-}
-
-func (s *storage) String() string {
-	return fmt.Sprintf("%d,%d,%s", s.position.X, s.position.Y, s.direction)
 }
