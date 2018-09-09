@@ -19,7 +19,7 @@ func main() {
 	}
 }
 
-func start(programArgs []string, storage robot.Storage, output io.Writer) error {
+func start(programArgs []string, storage storage.Storage, output io.Writer) error {
 	commands := prepareCommands(programArgs)
 	return robot.ProcessCommands(commands, storage, output)
 }
@@ -37,11 +37,11 @@ func prepareCommands(programArgs []string) []Command {
 		}
 		if loweredArg == "place" {
 			placeArgs := strings.Split(programArgs[i+1], ",")
-			c := robot.NewCommand(loweredArg, placeArgs)
+			c := robot.MakeCommand(loweredArg, placeArgs)
 			commands = append(commands, c)
 			argumentFound = true
 		} else {
-			c := robot.NewCommand(loweredArg, nil)
+			c := robot.MakeCommand(loweredArg, nil)
 			commands = append(commands, c)
 		}
 	}

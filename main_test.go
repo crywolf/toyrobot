@@ -60,6 +60,13 @@ func Test_start(t *testing.T) {
 			"",
 			true,
 		},
+
+		{
+			"Skip commands before PLACE command",
+			"MOVE MOVE REPORT PLACE 3,2,WEST MOVE REPORT",
+			"-> position: 2,2,WEST",
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

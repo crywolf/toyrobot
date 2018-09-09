@@ -2,10 +2,16 @@ package storage
 
 import (
 	"fmt"
-	"io"
-	"strconv"
 	"strings"
 )
+
+type Storage interface {
+	Position() point
+	SetPosition(point)
+	Direction() direction
+	SetDirection(direction)
+	fmt.Stringer
+}
 
 type direction int
 
@@ -30,7 +36,7 @@ func (d direction) String() string {
 	return names[d]
 }
 
-func (d *direction) FromString(s string) {
+func (d *direction) FromString(s string) error {
 	switch strings.ToLower(s) {
 	case "north":
 		*d = NORTH
@@ -40,7 +46,10 @@ func (d *direction) FromString(s string) {
 		*d = SOUTH
 	case "west":
 		*d = WEST
+	default:
+		return fmt.Errorf("illegal direction string value '%s'", s)
 	}
+	return nil
 }
 
 type point struct {
@@ -48,81 +57,33 @@ type point struct {
 }
 
 type storage struct {
-	Position  point
-	Direction direction
+	position  point
+	direction direction
 }
 
 func NewStorage() *storage {
 	return &storage{
-		Position:  point{},
-		Direction: NORTH,
+		position:  point{},
+		direction: NORTH,
 	}
 }
 
-func (s *storage) Place(pos []string) error {
-	x, err := strconv.Atoi(pos[0])
-	if err != nil {
-		return fmt.Errorf("cannot convert string %s to int: %v", pos[0], err)
-	}
-
-	y, err := strconv.Atoi(pos[1])
-	if err != nil {
-		return fmt.Errorf("cannot convert string %s to int: %v", pos[1], err)
-	}
-
-	if x < 0 || x > 4 || y < 0 || y > 4 {
-		return fmt.Errorf("illegal placement")
-	}
-	s.Position.X = x
-	s.Position.Y = y
-	s.Direction.FromString(pos[2])
-	return nil
+func (s *storage) Position() point {
+	return s.position
 }
 
-func (s *storage) Step() error {
-	switch s.Direction {
-	case NORTH:
-		if s.Position.Y < 4 {
-			s.Position.Y++
-		}
-	case SOUTH:
-		if s.Position.Y > 0 {
-			s.Position.Y--
-		}
-	case EAST:
-		if s.Position.X < 4 {
-			s.Position.X++
-		}
-	case WEST:
-		if s.Position.X > 0 {
-			s.Position.X--
-		}
-	}
-	return nil
+func (s *storage) SetPosition(p point) {
+	s.position = p
 }
 
-func (s *storage) Rotate(direction string) error {
-	if direction == "left" {
-		if s.Direction == 0 {
-			s.Direction += 3
-		} else {
-			s.Direction -= 1
-		}
-	} else if direction == "right" {
-		if s.Direction == 3 {
-			s.Direction -= 3
-		} else {
-			s.Direction += 1
-		}
-	}
-	return nil
+func (s *storage) Direction() direction {
+	return s.direction
 }
 
-func (s *storage) Report(w io.Writer) error {
-	fmt.Fprintln(w, "-> position:", s)
-	return nil
+func (s *storage) SetDirection(d direction) {
+	s.direction = d
 }
 
 func (s *storage) String() string {
-	return fmt.Sprintf("%d,%d,%s", s.Position.X, s.Position.Y, s.Direction)
+	return fmt.Sprintf("%d,%d,%s", s.position.X, s.position.Y, s.direction)
 }
