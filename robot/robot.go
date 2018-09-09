@@ -14,7 +14,19 @@ const (
 	maxY = 4
 )
 
-func ProcessCommands(commands []Command, storage storage.Storage, output io.Writer) error {
+type robot struct {
+	storage storage.Storage
+	output  io.Writer
+}
+
+func NewRobot(storage storage.Storage, output io.Writer) *robot {
+	return &robot{
+		storage: storage,
+		output:  output,
+	}
+}
+
+func (r *robot) ProcessCommands(commands []Command) error {
 	var err error
 	skip := true
 	for _, command := range commands {
@@ -27,13 +39,13 @@ func ProcessCommands(commands []Command, storage storage.Storage, output io.Writ
 
 		switch command.cmd {
 		case "place":
-			err = place(storage, command.args)
+			err = r.place(command.args)
 		case "move":
-			err = step(storage)
+			err = r.step()
 		case "left", "right":
-			err = rotate(storage, command.cmd)
+			err = r.rotate(command.cmd)
 		case "report":
-			err = report(storage, output)
+			err = r.report()
 		default:
 			err = fmt.Errorf("unknown command '%s'", command.cmd)
 		}
@@ -44,9 +56,9 @@ func ProcessCommands(commands []Command, storage storage.Storage, output io.Writ
 	return err
 }
 
-func place(s storage.Storage, pos []string) error {
-	position := s.Position()
-	direction := s.Direction()
+func (r *robot) place(pos []string) error {
+	position, _ := r.storage.Position()
+	direction, _ := r.storage.Direction()
 
 	x, err := strconv.Atoi(pos[0])
 	if err != nil {
@@ -70,14 +82,14 @@ func place(s storage.Storage, pos []string) error {
 		return fmt.Errorf("illegal placement (%v)", err)
 	}
 
-	s.SetPosition(position)
-	s.SetDirection(direction)
+	r.storage.SetPosition(position)
+	r.storage.SetDirection(direction)
 	return nil
 }
 
-func step(s storage.Storage) error {
-	pos := s.Position()
-	direc := s.Direction()
+func (r *robot) step() error {
+	pos, _ := r.storage.Position()
+	direc, _ := r.storage.Direction()
 
 	switch direc {
 	case storage.NORTH:
@@ -98,13 +110,13 @@ func step(s storage.Storage) error {
 		}
 	}
 
-	s.SetPosition(pos)
-	s.SetDirection(direc)
+	r.storage.SetPosition(pos)
+	r.storage.SetDirection(direc)
 	return nil
 }
 
-func rotate(s storage.Storage, direction string) error {
-	direc := s.Direction()
+func (r *robot) rotate(direction string) error {
+	direc, _ := r.storage.Direction()
 
 	if direction == "left" {
 		if direc == 0 {
@@ -120,11 +132,14 @@ func rotate(s storage.Storage, direction string) error {
 		}
 	}
 
-	s.SetDirection(direc)
+	r.storage.SetDirection(direc)
 	return nil
 }
 
-func report(s storage.Storage, w io.Writer) error {
-	fmt.Fprintln(w, "-> position:", s)
+func (r *robot) report() error {
+	_, err := fmt.Fprintln(r.output, "-> position:", r.storage)
+	if err != nil {
+		return fmt.Errorf("could not write to output stream: %v", err)
+	}
 	return nil
 }

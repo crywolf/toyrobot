@@ -20,7 +20,8 @@ func main() {
 
 func start(programArgs []string, storage storage.Storage, output io.Writer) error {
 	commands := prepareCommands(programArgs)
-	return robot.ProcessCommands(commands, storage, output)
+	r := robot.NewRobot(storage, output)
+	return r.ProcessCommands(commands)
 }
 
 // parses commandline and creates corresponding commands

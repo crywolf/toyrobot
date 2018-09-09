@@ -18,20 +18,22 @@ func NewStorage() *mstorage {
 	}
 }
 
-func (s *mstorage) Position() storage.Point {
-	return s.position
+func (s *mstorage) Position() (storage.Point, error) {
+	return s.position, nil
 }
 
-func (s *mstorage) SetPosition(p storage.Point) {
+func (s *mstorage) SetPosition(p storage.Point) error {
 	s.position = p
+	return nil
 }
 
-func (s *mstorage) Direction() storage.Direction {
-	return s.direction
+func (s *mstorage) Direction() (storage.Direction, error) {
+	return s.direction, nil
 }
 
-func (s *mstorage) SetDirection(d storage.Direction) {
+func (s *mstorage) SetDirection(d storage.Direction) error {
 	s.direction = d
+	return nil
 }
 
 func (s *mstorage) String() string {

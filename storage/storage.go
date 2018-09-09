@@ -6,10 +6,10 @@ import (
 )
 
 type Storage interface {
-	Position() Point
-	SetPosition(Point)
-	Direction() Direction
-	SetDirection(Direction)
+	Position() (Point, error)
+	SetPosition(Point) error
+	Direction() (Direction, error)
+	SetDirection(Direction) error
 	fmt.Stringer
 }
 
