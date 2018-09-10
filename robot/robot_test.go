@@ -9,7 +9,6 @@ import (
 )
 
 func TestProcessCommands(t *testing.T) {
-
 	tests := []struct {
 		name     string
 		commands []Command
@@ -93,27 +92,27 @@ func TestProcessCommands(t *testing.T) {
 			false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ms := memory.NewStorage()
-
-			r := NewRobot(ms, &bytes.Buffer{})
+			storage := memory.NewStorage()
+			r := NewRobot(storage, &bytes.Buffer{})
 
 			if err := r.ProcessCommands(tt.commands); (err != nil) != tt.wantErr {
 				t.Errorf("ProcessCommands() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
-			if position := ms.String(); tt.want != "" && position != tt.want {
+			if position := storage.String(); tt.want != "" && position != tt.want {
 				t.Errorf("ProcessCommands() = %v, want %v", position, tt.want)
 			}
 		})
 	}
 
-	t.Run("REPORT command Writes actual position to output writer", func(t *testing.T) {
-		ms := memory.NewStorage()
+	t.Run("REPORT command writes position to output writer", func(t *testing.T) {
+		storage := memory.NewStorage()
 		output := &bytes.Buffer{}
-		r := NewRobot(ms, output)
+		r := NewRobot(storage, output)
 
 		commands := []Command{
 			{"place", []string{"1", "2", "west"}},

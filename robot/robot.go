@@ -47,7 +47,7 @@ func (r *robot) ProcessCommands(commands []Command) error {
 		case "report":
 			err = r.report()
 		default:
-			err = fmt.Errorf("unknown command '%s'", command.cmd)
+			err = fmt.Errorf("robot: unknown command '%s'", command.cmd)
 		}
 		if err != nil {
 			break
@@ -57,21 +57,28 @@ func (r *robot) ProcessCommands(commands []Command) error {
 }
 
 func (r *robot) place(pos []string) error {
-	position, _ := r.storage.Position()
-	direction, _ := r.storage.Direction()
+	position, err := r.storage.Position()
+	if err != nil {
+		return err
+	}
+
+	direction, err := r.storage.Direction()
+	if err != nil {
+		return err
+	}
 
 	x, err := strconv.Atoi(pos[0])
 	if err != nil {
-		return fmt.Errorf("cannot convert string %s to int: %v", pos[0], err)
+		return fmt.Errorf("robot: cannot convert string %s to int: %v", pos[0], err)
 	}
 
 	y, err := strconv.Atoi(pos[1])
 	if err != nil {
-		return fmt.Errorf("cannot convert string %s to int: %v", pos[1], err)
+		return fmt.Errorf("robot: cannot convert string %s to int: %v", pos[1], err)
 	}
 
 	if x < 0 || x > maxX || y < 0 || y > maxY {
-		return fmt.Errorf("illegal placement (illegal position[%d,%d])", x, y)
+		return fmt.Errorf("robot: illegal placement (illegal position[%d,%d])", x, y)
 	}
 
 	position.X = x
@@ -79,17 +86,32 @@ func (r *robot) place(pos []string) error {
 
 	err = direction.FromString(pos[2])
 	if err != nil {
-		return fmt.Errorf("illegal placement (%v)", err)
+		return fmt.Errorf("robot: illegal placement (%v)", err)
 	}
 
-	r.storage.SetPosition(position)
-	r.storage.SetDirection(direction)
+	err = r.storage.SetPosition(position)
+	if err != nil {
+		return err
+	}
+
+	err = r.storage.SetDirection(direction)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (r *robot) step() error {
-	pos, _ := r.storage.Position()
-	direc, _ := r.storage.Direction()
+	pos, err := r.storage.Position()
+	if err != nil {
+		return err
+	}
+
+	direc, err := r.storage.Direction()
+	if err != nil {
+		return err
+	}
 
 	switch direc {
 	case storage.NORTH:
@@ -110,13 +132,24 @@ func (r *robot) step() error {
 		}
 	}
 
-	r.storage.SetPosition(pos)
-	r.storage.SetDirection(direc)
+	err = r.storage.SetPosition(pos)
+	if err != nil {
+		return err
+	}
+
+	err = r.storage.SetDirection(direc)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (r *robot) rotate(direction string) error {
-	direc, _ := r.storage.Direction()
+	direc, err := r.storage.Direction()
+	if err != nil {
+		return err
+	}
 
 	if direction == "left" {
 		if direc == 0 {
@@ -132,14 +165,18 @@ func (r *robot) rotate(direction string) error {
 		}
 	}
 
-	r.storage.SetDirection(direc)
+	err = r.storage.SetDirection(direc)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (r *robot) report() error {
 	_, err := fmt.Fprintln(r.output, "-> position:", r.storage)
 	if err != nil {
-		return fmt.Errorf("could not write to output stream: %v", err)
+		return fmt.Errorf("robot could not write to output stream: %v", err)
 	}
 	return nil
 }

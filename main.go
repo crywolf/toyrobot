@@ -12,7 +12,8 @@ import (
 )
 
 func main() {
-	err := start(os.Args[1:], memory.NewStorage(), os.Stdout)
+	db := memory.NewStorage()
+	err := start(os.Args[1:], db, os.Stdout)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 	}

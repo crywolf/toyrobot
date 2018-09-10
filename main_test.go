@@ -9,7 +9,6 @@ import (
 )
 
 func Test_start(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		args    string
@@ -34,7 +33,6 @@ func Test_start(t *testing.T) {
 			"-> position: 3,3,NORTH",
 			false,
 		},
-
 		{
 			"Try to move outside the table 1",
 			"PLACE 0,0,NORTH LEFT MOVE REPORT",
@@ -53,7 +51,6 @@ func Test_start(t *testing.T) {
 			"-> position: 4,2,EAST",
 			false,
 		},
-
 		{
 			"Try to place outside the table ends with error 1",
 			"PLACE -1,2,SOUTH LEFT MOVE MOVE REPORT",
@@ -66,15 +63,14 @@ func Test_start(t *testing.T) {
 			"",
 			true,
 		},
-
 		{
-			"Skip commands before PLACE command",
+			"Skip all commands before PLACE command",
 			"MOVE MOVE REPORT PLACE 3,2,WEST MOVE REPORT",
 			"-> position: 2,2,WEST",
 			false,
 		},
 		{
-			"Report command used more then once ",
+			"Report command used more then once",
 			"PLACE 3,2,WEST REPORT MOVE REPORT",
 			"-> position: 3,2,WEST\n-> position: 2,2,WEST",
 			false,
@@ -83,6 +79,9 @@ func Test_start(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			storage := memory.NewStorage()
+			//	storage := buntdb.NewStorage()
+			//	defer storage.Close()
+
 			var output bytes.Buffer
 
 			args := strings.Split(tt.args, " ")
